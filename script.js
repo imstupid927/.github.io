@@ -9,9 +9,21 @@ let currentRoom = 0;
 let timer = 60; // 60 seconds time limit
 
 const rooms = [
-    { clues: [{ x: 100, y: 150, found: false }, { x: 500, y: 300, found: false }] },
-    { clues: [{ x: 200, y: 200, found: false }, { x: 600, y: 450, found: false }] },
-    { clues: [{ x: 300, y: 100, found: false }, { x: 700, y: 400, found: false }] },
+    {
+        name: 'Living Room',
+        clues: [{ x: 100, y: 150, found: false }, { x: 500, y: 300, found: false }],
+        objects: [{ x: 400, y: 450, width: 50, height: 50, description: 'A suspicious bookshelf.' }],
+    },
+    {
+        name: 'Kitchen',
+        clues: [{ x: 200, y: 200, found: false }, { x: 600, y: 450, found: false }],
+        objects: [{ x: 350, y: 400, width: 50, height: 50, description: 'A shiny knife on the counter.' }],
+    },
+    {
+        name: 'Bedroom',
+        clues: [{ x: 300, y: 100, found: false }, { x: 700, y: 400, found: false }],
+        objects: [{ x: 450, y: 350, width: 50, height: 50, description: 'A diary with a torn page.' }],
+    },
 ];
 
 document.addEventListener('keydown', (event) => {
@@ -48,6 +60,14 @@ function drawClues() {
     }
 }
 
+function drawObjects() {
+    const room = rooms[currentRoom];
+    for (const obj of room.objects) {
+        ctx.strokeStyle = 'blue';
+        ctx.strokeRect(obj.x, obj.y, obj.width, obj.height);
+    }
+}
+
 function checkClick(x, y) {
     const room = rooms[currentRoom];
     for (const clue of room.clues) {
@@ -61,6 +81,16 @@ function checkClick(x, y) {
             clue.found = true;
             cluesFound += 1;
             break;
+        }
+    }
+    for (const obj of room.objects) {
+        if (
+            x >= obj.x &&
+            x <= obj.x + obj.width &&
+            y >= obj.y &&
+            y <= obj.y + obj.height
+        ) {
+            alert(obj.description);
         }
     }
 }
@@ -102,8 +132,10 @@ function gameLoop() {
     } else if (room) {
         drawText(`Clues found: ${cluesFound}/${totalClues}`, 10, 20);
         drawText(`Time left: ${timer}s`, 10, 50);
+        drawText(`Current Room: ${rooms[currentRoom].name}`, 10, 80);
         drawText('Investigate the room and find clues!', 50, 100);
         drawClues();
+        drawObjects();
         if (cluesFound === totalClues) {
             drawText("You've found all the clues! Solve the mystery!", 50, 200);
         } else if (currentRoom < rooms.length - 1 && cluesFound >= (currentRoom + 1) * 2) {
